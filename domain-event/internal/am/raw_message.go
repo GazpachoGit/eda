@@ -1,11 +1,12 @@
 package am
 
-// implementation of the Message interface
 type RawMessage interface {
 	Message
 	Data() []byte
 }
 
+// submit rawMessage implementation
+// we DO NOT need func implementation
 type rawMessage struct {
 	id   string
 	name string
