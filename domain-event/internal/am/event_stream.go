@@ -36,7 +36,7 @@ func (s eventStream) Publish(ctx context.Context, topicName string, event ddd.Ev
 	}
 
 	//Serialize domain event as the payload field
-	payload, err := s.reg.Serialize(event.EventName(), event.Payload())
+	payload, err := s.reg.Serialize(event.EventName())
 	if err != nil {
 		return err
 	}
@@ -87,7 +87,7 @@ func (s eventStream) Subscribe(topicName string, handler MessageHandler[EventMes
 
 		eventName := msg.MessageName()
 
-		payload, err := s.reg.Deserialize(eventName, eventData.GetPayload())
+		payload, err := s.reg.Deserialize(eventData.GetPayload())
 		if err != nil {
 			return err
 		}

@@ -4,8 +4,10 @@ import (
 	"context"
 	"domain-event/internal/am"
 	"domain-event/internal/ddd"
+	"domain-event/internal/domain"
 	"domain-event/internal/handlers"
 	"domain-event/internal/jetstream"
+	"domain-event/internal/registry"
 	"domain-event/internal/waiter"
 	"fmt"
 
@@ -19,9 +21,10 @@ const (
 )
 
 type App struct {
-	nc     *nats.Conn
-	js     nats.JetStreamContext
-	waiter waiter.Waiter
+	nc               *nats.Conn
+	js               nats.JetStreamContext
+	waiter           waiter.Waiter
+	domainDispatcher *ddd.EventDispatcher
 }
 
 func NewApp() (*App, error) {
@@ -37,14 +40,14 @@ func NewApp() (*App, error) {
 
 	waiter := waiter.New(waiter.CatchSignals())
 
-	a := &App{
-		nc, js, waiter,
-	}
-
-	eventStream := am.NewEventStream(reg, jetstream.NewStream(cfg_Nats_Stream, js))
+	eventStream := am.NewEventStream(registry.NewRegistry(), jetstream.NewStream(cfg_Nats_Stream, js))
 	domainDispatcher := ddd.NewEventDispatcher()
 	asyncHandler := handlers.NewIntegrationEventHandlers(eventStream)
 	handlers.RegisterIntegrationEventHandlers(domainDispatcher, asyncHandler)
+
+	a := &App{
+		nc, js, waiter, domainDispatcher,
+	}
 
 	a.waiter.Add(
 		a.waitForStream,
@@ -87,4 +90,9 @@ func (a *App) waitForStream(ctx context.Context) error {
 
 func (a *App) Waiter() waiter.Waiter {
 	return a.waiter
+}
+
+func (a *App) SendStoreCreatedEvent(ID int, Name string, Location string) {
+	event := ddd.NewEvent(domain.StoreCreatedEvent, domain.StoreCreated{ID, Name, Location})
+	a.domainDispatcher.Publish(context.Background(), event)
 }
