@@ -30,7 +30,7 @@ func (s *Stream) Publish(ctx context.Context, topicName string, rawMsg am.RawMes
 	data, err = proto.Marshal(&StreamMessage{
 		Id:   rawMsg.ID(),
 		Name: rawMsg.MessageName(),
-		Data: rawMsg.Data,
+		Data: rawMsg.Data(),
 	})
 	if err != nil {
 		return err
