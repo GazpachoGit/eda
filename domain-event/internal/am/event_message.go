@@ -1,7 +1,7 @@
 package am
 
 import (
-	ddd "domain-event/internal/domain"
+	ddd "domain-event/internal/ddd"
 	"time"
 )
 

@@ -2,7 +2,7 @@ package am
 
 import (
 	"context"
-	ddd "domain-event/internal/domain"
+	ddd "domain-event/internal/ddd"
 	"domain-event/internal/registry"
 
 	"google.golang.org/protobuf/proto"
@@ -17,6 +17,13 @@ type EventStream = MessageStream[ddd.Event, EventMessage]
 type eventStream struct {
 	reg    registry.Registry
 	stream MessageStream[RawMessage, RawMessage]
+}
+
+func NewEventStream(reg registry.Registry, stream MessageStream[RawMessage, RawMessage]) EventStream {
+	return &eventStream{
+		reg:    reg,
+		stream: stream,
+	}
 }
 
 func (s eventStream) Publish(ctx context.Context, topicName string, event ddd.Event) error {

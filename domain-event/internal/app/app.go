@@ -2,6 +2,10 @@ package app
 
 import (
 	"context"
+	"domain-event/internal/am"
+	"domain-event/internal/ddd"
+	"domain-event/internal/handlers"
+	"domain-event/internal/jetstream"
 	"domain-event/internal/waiter"
 	"fmt"
 
@@ -36,6 +40,11 @@ func NewApp() (*App, error) {
 	a := &App{
 		nc, js, waiter,
 	}
+
+	eventStream := am.NewEventStream(reg, jetstream.NewStream(cfg_Nats_Stream, js))
+	domainDispatcher := ddd.NewEventDispatcher()
+	asyncHandler := handlers.NewIntegrationEventHandlers(eventStream)
+	handlers.RegisterIntegrationEventHandlers(domainDispatcher, asyncHandler)
 
 	a.waiter.Add(
 		a.waitForStream,

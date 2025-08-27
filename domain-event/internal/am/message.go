@@ -2,7 +2,7 @@ package am
 
 import (
 	"context"
-	ddd "domain-event/internal/domain"
+	ddd "domain-event/internal/ddd"
 )
 
 type Message interface {
