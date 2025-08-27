@@ -1,4 +1,4 @@
-package app
+package consumer
 
 import (
 	"context"
@@ -42,8 +42,8 @@ func NewApp() (*App, error) {
 
 	eventStream := am.NewEventStream(registry.NewRegistry(), jetstream.NewStream(cfg_Nats_Stream, js))
 	domainDispatcher := ddd.NewEventDispatcher()
-	asyncHandler := handlers.NewIntegrationEventHandlers(eventStream)
-	handlers.RegisterIntegrationEventHandlers(domainDispatcher, asyncHandler)
+	consumerHandler := handlers.NewConsumedEventHandler()
+	handlers.RegisterConsumerEventHandler(eventStream, consumerHandler.HandleEvent)
 
 	a := &App{
 		nc, js, waiter, domainDispatcher,

@@ -1,11 +1,9 @@
 package main
 
-import (
-	"domain-event/internal/app"
-)
+import producer "domain-event/internal/app/producer_app"
 
 func main() {
-	app, err := app.NewApp()
+	app, err := producer.NewApp()
 	if err != nil {
 		panic("can't run")
 	}
